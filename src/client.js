@@ -1,12 +1,15 @@
-// import Redis from 'ioredis';
+import { createClient } from 'redis';
 
-// const client = new Redis({
-//   host: '127.0.0.1'
-//   ,  // or your Docker host IP
-//   port: 6379,
-// });
+const client = createClient({
+  url: 'redis://redis-stack:6379'
+ // default Redis port
 
-// client.on('connect', () => console.log('✅ Connected to Redis'));
-// client.on('error', (err) => console.error('Redis error:', err));
+});
 
-// export default client;
+client.on('error', (err) => console.log('Redis Client Error', err));
+
+await client.connect();
+
+console.log('Connected to Redis!');
+
+export default client;

@@ -5,7 +5,7 @@ import { generate } from "./util.js";
 import path from "path";
 import { getAllFiles } from "./file.js";
 // import { createClient } from "redis";
-// import client from "./client.js";
+import client from "./client.js";
 
 // const publisher = createClient();
 // publisher.connect();
@@ -23,6 +23,8 @@ app.post("/deploy", async (req, res) => {
     const id = generate();
     await simpleGit().clone(repoUrl,  `../output/${id}`);
     await simpleGit().clone(repoUrl,  `/app/output/${id}`);
+
+    await client.lPush("repoqueue", id);
 
     const files = getAllFiles( `../output/${id}`);
 
