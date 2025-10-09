@@ -1,0 +1,13 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  nodeapp:
+    build: .
+    ports:
+      - "4000:4000"
+    volumes:
+      - appdata:/app/output
+
+volumes:
+  appdata:

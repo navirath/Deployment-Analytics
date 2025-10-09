@@ -4,9 +4,11 @@ import { simpleGit } from "simple-git";
 import { generate } from "./util.js";
 import path from "path";
 import { getAllFiles } from "./file.js";
-import { createClient } from "redis";
-const publisher = createClient();
-publisher.connect();
+// import { createClient } from "redis";
+// import client from "./client.js";
+
+// const publisher = createClient();
+// publisher.connect();
 
 const PORT = 4000;
 const app = express();
@@ -20,10 +22,15 @@ app.post("/deploy", async (req, res) => {
     console.log(repoUrl);
     const id = generate();
     await simpleGit().clone(repoUrl,  `../output/${id}`);
+    await simpleGit().clone(repoUrl,  `/app/output/${id}`);
+
     const files = getAllFiles( `../output/${id}`);
 
-    publisher.lPush("build-queue", id);    
+    // publisher.lPush("build-queue", id);    
 
+        // await client.lpush("build-queue", id);
+        // console.log(`${id} added to the queue build-queue`);   
+    
     res.json({
         id: id
     });
