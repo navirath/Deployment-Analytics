@@ -5,6 +5,7 @@ import { generate } from "./util.js";
 import path from "path";
 import { getAllFiles } from "./file.js";
 import client from "./client.js";
+import subscribe from "./subscriber.js";
 
 const PORT = 4000;
 const app = express();
@@ -23,6 +24,8 @@ app.post("/deploy", async (req, res) => {
     
 
     await client.lPush("repoqueue", id);
+    subscribe();
+    
 
     const files = getAllFiles( `../output/${id}`);
     res.json({
