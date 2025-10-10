@@ -1,11 +1,16 @@
-# docker-compose.yml
 version: '3.8'
+
+networks:
+  redisnet:
+    external: true
 
 services:
   nodeapp:
     build: .
     ports:
       - "4000:4000"
+    networks:
+      - redisnet
     volumes:
       - appdata:/app/output
 

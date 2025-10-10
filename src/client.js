@@ -1,7 +1,7 @@
 import { createClient } from 'redis';
 
 const client = createClient({
-  url: 'redis://redis-stack:6379'
+  url: "redis://redis-stack:6379"
  // default Redis port
 });
 
