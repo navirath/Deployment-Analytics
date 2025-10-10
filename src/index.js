@@ -6,6 +6,8 @@ import path from "path";
 import { getAllFiles } from "./file.js";
 import client from "./client.js";
 import subscribe from "./subscriber.js";
+import  { uploadFile } from "./aws.js";
+import fs from "fs";
 
 const PORT = 4000;
 const app = express();
@@ -20,14 +22,20 @@ app.post("/deploy", async (req, res) => {
     const id = generate();
     
     await simpleGit().clone(repoUrl,  `../output/${id}`);
-    await simpleGit().clone(repoUrl,  `/app/output/${id}`);
+    // await simpleGit().clone(repoUrl,  `/app/output/${id}`);
     
+    const files = getAllFiles( `../output/${id}`);
+    console.log(files);
+    
+    files.forEach( async file => {
+        await uploadFile(id, file)
+    })
+
 
     await client.lPush("repoqueue", id);
     subscribe();
     
 
-    const files = getAllFiles( `../output/${id}`);
     res.json({
         id: id
     });
