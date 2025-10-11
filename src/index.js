@@ -25,11 +25,13 @@ app.post("/deploy", async (req, res) => {
     // await simpleGit().clone(repoUrl,  `/app/output/${id}`);
     
     const files = getAllFiles( `../output/${id}`);
-    console.log(files);
+    // console.log(files);
     
-    files.forEach( async file => {
-        await uploadFile(id, file)
-    })
+   for (const file of files) {
+    await uploadFile(id, file);
+}
+console.log("All files uploaded!");
+
 
 
     await client.lPush("repoqueue", id);
