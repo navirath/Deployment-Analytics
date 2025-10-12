@@ -19,7 +19,7 @@ export const uploadFile = async (fileName, localFilePath) => {
     const fileContent = fs.readFileSync(localFilePath);
 
     // Ensure bucket exists before upload
-    const bucketName = "repos";
+    const bucketName = "repo";
     try {
       await s3.headBucket({ Bucket: bucketName }).promise();
     } catch (err) {

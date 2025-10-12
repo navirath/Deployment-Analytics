@@ -20,24 +20,30 @@ app.post("/deploy", async (req, res) => {
     const repoUrl = req.body.repoUrl;
     console.log(repoUrl);
     const id = generate();
-    
-    await simpleGit().clone(repoUrl,  `../output/${id}`);
-    // await simpleGit().clone(repoUrl,  `/app/output/${id}`);
-    
-    const files = getAllFiles( `../output/${id}`);
-    // console.log(files);
-    
-   for (const file of files) {
-    await uploadFile(id, file);
-}
-console.log("All files uploaded!");
 
+    const outputPath = `/output/${id}`; // ✅ Always clone into container-mapped folder
+    await simpleGit().clone(repoUrl, outputPath);
+    const files = getAllFiles(outputPath);
+    console.log(files);
+
+    console.log("files : ");
+    for (const file of files) {
+        console.log(file);
+    }
+
+   for (const filePath of files) {
+        // Remove "/output/3tzf8/" from the start to make a clean S3 key
+        const key = filePath.replace('/output/', ''); // gives '3tzf8/src/App.jsx'
+        console.log("Uploading:", key);
+        await uploadFile(key, filePath);
+    }
+
+    console.log("All files uploaded to LocalStack S3!");
 
 
     await client.lPush("repoqueue", id);
     subscribe();
     
-
     res.json({
         id: id
     });

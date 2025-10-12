@@ -12,7 +12,5 @@ services:
     networks:
       - redisnet
     volumes:
-      - appdata:/app/output
+      - ./output:/output
 
-volumes:
-  appdata:
