@@ -8,6 +8,7 @@ import client from "./redis/client.js";
 import subscribe from "./redis/subscriber.js";
 import  { uploadFile } from "./aws/aws.js";
 import fs from "fs";
+import { detectLanguage, generateDockerfile } from "./Resource_estimation/dockerFileGenerator.js";
 
 const PORT = 4000;
 const app = express();
@@ -34,10 +35,17 @@ app.post("/deploy", async (req, res) => {
     }
 
     console.log("All files uploaded to LocalStack S3!");
-
+    
 
     await client.lPush("repoqueue", id);
-    subscribe();
+    const poppedId = await subscribe();
+    console.log(`id popped: ${poppedId}`);
+    
+    console.log()
+    const lang = detectLanguage(`./oRutput/${poppedId}`);
+    console.log(`Language detected: ${lang}`);
+    
+    await generateDockerfile(`./output/${poppedId}`);
     
     res.json({
         id: id
