@@ -1,12 +1,12 @@
 import express from "express";
 import cors from "cors";
 import { simpleGit } from "simple-git";
-import { generate } from "./util.js";
+import { generate } from "./util/util.js";
 import path from "path";
-import { getAllFiles } from "./file.js";
-import client from "./client.js";
-import subscribe from "./subscriber.js";
-import  { uploadFile } from "./aws.js";
+import { getAllFiles } from "./File Handling/file.js";
+import client from "./redis/client.js";
+import subscribe from "./redis/subscriber.js";
+import  { uploadFile } from "./aws/aws.js";
 import fs from "fs";
 
 const PORT = 4000;
@@ -25,11 +25,6 @@ app.post("/deploy", async (req, res) => {
     await simpleGit().clone(repoUrl, outputPath);
     const files = getAllFiles(outputPath);
     console.log(files);
-
-    console.log("files : ");
-    for (const file of files) {
-        console.log(file);
-    }
 
    for (const filePath of files) {
         // Remove "/output/3tzf8/" from the start to make a clean S3 key
