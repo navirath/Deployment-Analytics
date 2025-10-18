@@ -3,17 +3,18 @@ import path from 'path';
 import OpenAI from 'openai'; // Ensure you install openai SDK: npm i openai
 
 // === 1. Detect Language ===
-export function detectLanguage(repoPath) {
-  if (fs.existsSync(path.join(repoPath, 'package.json'))) return 'node';
-  if (fs.existsSync(path.join(repoPath, 'requirements.txt')) || hasPyFiles(repoPath)) return 'python';
-  if (fs.existsSync(path.join(repoPath, 'go.mod')) || hasGoFiles(repoPath)) return 'go';
-  if (fs.existsSync(path.join(repoPath, 'pom.xml'))) return 'java';
-  if (fs.existsSync(path.join(repoPath, 'Gemfile'))) return 'ruby';
-  if (fs.existsSync(path.join(repoPath, 'composer.json'))) return 'php';
-  if (fs.existsSync(path.join(repoPath, 'Cargo.toml'))) return 'rust';
-  if (hasCsprojFiles(repoPath)) return 'csharp';
-  if (hasCFiles(repoPath)) return 'c_cpp';
-  return 'unknown';
+export function detectLanguageFromFilePath(filePath) {
+  if (filePath.endsWith("package.json") || filePath.endsWith(".js") || filePath.endsWith(".mjs")) return "node";
+  if (filePath.endsWith("requirements.txt") || filePath.endsWith(".py")) return "python";
+  if (filePath.endsWith("go.mod") || filePath.endsWith(".go")) return "go";
+  if (filePath.endsWith("pom.xml") || filePath.endsWith(".java")) return "java";
+  if (filePath.endsWith("Gemfile") || filePath.endsWith(".rb")) return "ruby";
+  if (filePath.endsWith("composer.json") || filePath.endsWith(".php")) return "php";
+  if (filePath.endsWith("Cargo.toml") || filePath.endsWith(".rs")) return "rust";
+  if (filePath.endsWith(".csproj") || filePath.endsWith(".cs")) return "csharp";
+  if (filePath.endsWith(".c") || filePath.endsWith(".cpp") || filePath.endsWith(".h")) return "c_cpp";
+
+  return null;
 }
 
 // Helper functions
@@ -100,7 +101,7 @@ CMD ["./app"]`
 };
 
 // === 3. Generate Dockerfile ===
-export async function generateDockerfile(repoPath, lang, openAiApiKey) {
+export async function generateDockerfile(repoPath, lang) {
   const dockerfilePath = path.join(repoPath, 'Dockerfile');
   if (fs.existsSync(dockerfilePath)) return;
 
@@ -110,25 +111,25 @@ export async function generateDockerfile(repoPath, lang, openAiApiKey) {
     return;
   }
 
-  // === 4. Fallback to AI ===
-  console.log(`Language "${lang}" not in templates. Using AI to generate Dockerfile...`);
+//   // === 4. Fallback to AI ===
+//   console.log(`Language "${lang}" not in templates. Using AI to generate Dockerfile...`);
 
-  const files = fs.readdirSync(repoPath).join(', ');
-  const prompt = `
-You are a Docker expert.
-I have a project with the following files: ${files}
-Detected language: ${lang}
-Generate a Dockerfile that builds and runs this project.
-Only give the Dockerfile content, no explanations.
-`;
+//   const files = fs.readdirSync(repoPath).join(', ');
+//   const prompt = `
+// You are a Docker expert.
+// I have a project with the following files: ${files}
+// Detected language: ${lang}
+// Generate a Dockerfile that builds and runs this project.
+// Only give the Dockerfile content, no explanations.
+// `;
 
-  const openai = new OpenAI({ apiKey: openAiApiKey });
-  const response = await openai.chat.completions.create({
-    model: "gpt-5-mini",
-    messages: [{ role: "user", content: prompt }],
-  });
+//   const openai = new OpenAI({ apiKey: openAiApiKey });
+//   const response = await openai.chat.completions.create({
+//     model: "gpt-5-mini",
+//     messages: [{ role: "user", content: prompt }],
+//   });
 
-  const dockerfileContent = response.choices[0].message.content;
-  fs.writeFileSync(dockerfilePath, dockerfileContent);
-  console.log(`Dockerfile generated using AI for ${lang}`);
+//   const dockerfileContent = response.choices[0].message.content;
+//   fs.writeFileSync(dockerfilePath, dockerfileContent);
+//   console.log(`Dockerfile generated using AI for ${lang}`);
 }
