@@ -2,12 +2,12 @@ import express from "express";
 import cors from "cors";
 import { simpleGit } from "simple-git";
 import { generate } from "./util/util.js";
-import path from "path";
 import { getAllFiles } from "./File Handling/file.js";
 import client from "./redis/client.js";
 import subscribe from "./redis/subscriber.js";
 import  { uploadFile } from "./aws/aws.js";
-import fs from "fs";
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+import { detectLanguageFromFilePath, generateDockerfile } from "./Resource_estimation/dockerFileGenerator.js";
 
 const PORT = 4000;
 const app = express();
@@ -34,10 +34,33 @@ app.post("/deploy", async (req, res) => {
     }
 
     console.log("All files uploaded to LocalStack S3!");
-
+    
 
     await client.lPush("repoqueue", id);
-    subscribe();
+    // const key = await subscribe();
+    // console.log(`id popped: ${key}`);
+
+    let lang = null;
+
+    for (const filePath of files) {
+    lang = detectLanguageFromFilePath(filePath);
+    if (lang) {
+        console.log(`Language detected from ${filePath}: ${lang}`);
+        break;
+    }
+    }
+
+    if (lang) {
+    await generateDockerfile(outputPath, lang);
+    } else {
+    console.log("Could not detect language from file paths.");
+    }
+
+
+     
+    
+    
+    
     
     res.json({
         id: id

@@ -1,0 +1,20 @@
+{
+  "name": "resource_estimation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "util.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "autocannon": "^8.0.0",
+    "dockerode": "^4.0.9",
+    "express": "^5.1.0",
+    "openai": "^6.3.0",
+    "uuid": "^13.0.0"
+  }
+}
